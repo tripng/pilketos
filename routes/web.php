@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ClassRoomController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VoterAuthController;
 use App\Http\Controllers\VoteController;

@@ -16,13 +16,13 @@ class VoteController extends Controller
     /**
      * Halaman pemilihan — hanya untuk pemilih yang sudah login & belum memilih.
      */
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $studentId = $request->session()->get('voter_student_id');
         $periodId = $request->session()->get('voter_period_id');
 
         if (! $studentId) {
-            return redirect()->route('voter.login');
+            return redirect('/');
         }
 
         $student = Student::find($studentId);
