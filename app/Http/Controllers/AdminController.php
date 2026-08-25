@@ -68,7 +68,7 @@ class AdminController extends Controller
 
         // Jumlah siswa per kelas
         $kelas = ClassRoom::orderBy('code')
-            ->get(['code'])
+            ->get(['id', 'code'])
             ->map(function (ClassRoom $c) {
                 return [
                     'kelas' => $c->code,
