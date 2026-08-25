@@ -78,6 +78,14 @@ export default function VoteBars({ data, lastIncreased }) {
             <div className="flex justify-around gap-4 px-2">
                 {data.map((d) => {
                     const isHot = lastIncreased === d.number;
+                    // Foto "happy" bisa jadi kosong di DB — fallback ke foto biasa
+                    // agar <img> tidak jadi alt-text saat sebuah paslon dapat suara.
+                    const capresSrc = isHot
+                        ? d.capres.photoHappy || d.capres.photo
+                        : d.capres.photo;
+                    const cawapresSrc = isHot
+                        ? d.cawapres.photoHappy || d.cawapres.photo
+                        : d.cawapres.photo;
                     return (
                         <div
                             key={d.number}
@@ -93,20 +101,12 @@ export default function VoteBars({ data, lastIncreased }) {
                                 }
                             >
                                 <img
-                                    src={
-                                        isHot
-                                            ? d.capres.photoHappy
-                                            : d.capres.photo
-                                    }
+                                    src={capresSrc}
                                     alt={`Capres Paslon ${d.number}`}
                                     className="h-full w-full object-cover"
                                 />
                                 <img
-                                    src={
-                                        isHot
-                                            ? d.cawapres.photoHappy
-                                            : d.cawapres.photo
-                                    }
+                                    src={cawapresSrc}
                                     alt={`Cawapres Paslon ${d.number}`}
                                     className="h-full w-full object-cover"
                                 />
