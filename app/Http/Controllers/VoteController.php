@@ -22,9 +22,7 @@ class VoteController extends Controller
         $periodId = $request->session()->get('voter_period_id');
 
         if (! $studentId) {
-            return Inertia::render('VoterLogin', [
-                'errors' => ['nisn' => 'Silakan masuk terlebih dahulu.'],
-            ]);
+            return redirect()->route('voter.login');
         }
 
         $student = Student::find($studentId);

@@ -83,14 +83,15 @@ class VoterAuthController extends Controller
         }
 
         // Login berhasil — simpan identitas di session
-        session([
-            'voter_student_id' => $student->id,
-            'voter_period_id' => $period->id,
-            'voter_voted' => false,
-        ]);
+        $request->session()->put('voter_student_id', $student->id);
+        $request->session()->put('voter_period_id', $period->id);
+        $request->session()->put('voter_voted', false);
+        // Tulis session ke store (database) seketika agar tersedia
+        // pada request berikutnya ke /pilih.
+        $request->session()->save();
 
-        // Langsung tampilkan halaman pemilihan (reuse VoteController)
-        return app(VoteController::class)->index($request);
+        // Arahkan ke halaman pemilihan (request GET baru akan membaca session).
+        return redirect()->route('vote');
     }
 
     /**
