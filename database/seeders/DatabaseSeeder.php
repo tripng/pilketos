@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 3. 4 Paslon (dengan foto Unsplash sebagai placeholder)
+        // 3. 3 Paslon (dengan foto Unsplash sebagai placeholder)
         $candidates = [
             [
                 'number' => 1, 'name' => 'Budi & Ani',
@@ -64,13 +64,6 @@ class DatabaseSeeder extends Seeder
                 'capres_photo' => 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=160&h=160&q=80',
                 'cawapres_photo' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&h=160&q=80',
                 'color' => '#34d399',
-            ],
-            [
-                'number' => 4, 'name' => 'Andi & Maya',
-                'capres_name' => 'Andi Firmansyah', 'cawapres_name' => 'Maya Sari',
-                'capres_photo' => 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=160&h=160&q=80',
-                'cawapres_photo' => 'https://images.unsplash.com/photo-1488161628813-04466f872be2?auto=format&fit=crop&w=160&h=160&q=80',
-                'color' => '#6ee7b7',
             ],
         ];
         foreach ($candidates as $c) {
@@ -103,9 +96,10 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 6. Admin default
+        // 6. Admin default (NISN 0011223344 → login lewat form pemilih ke /admin)
         Admin::create([
             'username' => 'admin',
+            'nisn' => '0011223344',
             'password' => bcrypt('admin123'),
         ]);
     }

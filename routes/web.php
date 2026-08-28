@@ -9,6 +9,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::post('/admin/logout', [AdminController::class, 'logout'])
+    ->name('admin.logout');
+
 Route::get('/', [VoterAuthController::class, 'showLogin'])
     ->name('voter.login');
 
@@ -24,14 +27,16 @@ Route::get('/pilih', [VoteController::class, 'index'])
 Route::post('/pilih', [VoteController::class, 'store'])
     ->name('vote.store');
 
-Route::get('/admin', [AdminController::class, 'dashboard'])
-    ->name('admin.dashboard');
+Route::middleware('auth.admin')->group(function () {
+    Route::get('/admin', [AdminController::class, 'dashboard'])
+        ->name('admin.dashboard');
 
-Route::get('/admin/kelas', [ClassRoomController::class, 'index'])
-    ->name('admin.classes');
+    Route::get('/admin/kelas', [ClassRoomController::class, 'index'])
+        ->name('admin.classes');
 
-Route::post('/admin/kelas/{classRoom}/toggle', [ClassRoomController::class, 'toggle'])
-    ->name('admin.classes.toggle');
+    Route::post('/admin/kelas/{classRoom}/toggle', [ClassRoomController::class, 'toggle'])
+        ->name('admin.classes.toggle');
+});
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

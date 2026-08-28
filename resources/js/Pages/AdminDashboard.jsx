@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import KemenagLogo from '@/Components/KemenagLogo';
 import StatCard from '@/Components/admin/StatCard';
@@ -11,6 +11,11 @@ export default function AdminDashboard({ stats, votes, kelas, live }) {
     const [lastIncreased, setLastIncreased] = useState(null);
     const [pulse, setPulse] = useState(0);
     const prevVotes = useRef(votes);
+    const adminName = usePage().props.auth?.admin?.username;
+
+    const logout = () => {
+        router.post('/admin/logout');
+    };
 
     // Sinkronkan dengan props terbaru (mis. setelah polling)
     useEffect(() => {
@@ -63,10 +68,21 @@ export default function AdminDashboard({ stats, votes, kelas, live }) {
                             </p>
                         </div>
                     </div>
-                    <span className="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                        <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-                        LIVE
-                    </span>
+                    <div className="flex items-center gap-3">
+                        {adminName && (
+                            <span className="hidden text-sm font-medium text-emerald-700/80 sm:inline">
+                                {adminName}
+                            </span>
+                        )}
+                        <button
+                            type="button"
+                            onClick={logout}
+                            className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-white/80 px-3 py-1.5 text-sm font-semibold text-emerald-700 shadow-sm backdrop-blur transition hover:bg-emerald-50 hover:text-emerald-800 active:scale-95"
+                        >
+                            <span aria-hidden>⎋</span>
+                            Keluar
+                        </button>
+                    </div>
                 </div>
             </header>
 

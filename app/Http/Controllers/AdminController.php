@@ -7,7 +7,9 @@ use App\Models\ClassRoom;
 use App\Models\ElectionPeriod;
 use App\Models\Student;
 use App\Models\Vote;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -87,5 +89,18 @@ class AdminController extends Controller
             'kelas' => $kelas,
             'live' => true,
         ]);
+    }
+
+    /**
+     * Logout admin (guard "admin") → kembali ke halaman login pemilih.
+     */
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::guard('admin')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }

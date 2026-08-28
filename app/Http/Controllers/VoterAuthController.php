@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\ClassRoom;
 use App\Models\ElectionPeriod;
 use App\Models\Student;
 use App\Models\Vote;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -54,24 +56,43 @@ class VoterAuthController extends Controller
     {
         $nisn = preg_replace('/\D/', '', (string) $request->input('nisn'));
 
+        // Validasi NISN wajib diisi & berupa angka 10 digit.
+        $validator = \Illuminate\Support\Facades\Validator::make(
+            ['nisn' => $nisn],
+            ['nisn' => 'required|digits:10'],
+        );
+        if ($validator->fails()) {
+            throw new \Illuminate\Validation\ValidationException($validator);
+        }
+
+        // Filter 0: NISN ini milik admin? → login sebagai admin lalu ke panel.
+        $admin = Admin::where('nisn', $nisn)->first();
+        if ($admin) {
+            Auth::guard('admin')->login($admin);
+            $request->session()->regenerate();
+
+            return redirect()->route('admin.dashboard');
+        }
+
         $student = Student::where('nisn', $nisn)->first();
 
         // Filter 1: NISN terdaftar
         if (! $student) {
-            return back()->withErrors(['nisn' => 'NISN tidak terdaftar.']);
+            $validator->errors()->add('nisn', 'NISN tidak terdaftar.');
+            throw new \Illuminate\Validation\ValidationException($validator);
         }
 
         // Filter 2: Kelas dibuka
         if (! $student->class || ! $student->class->is_open) {
-            return back()->withErrors([
-                'nisn' => 'Kelas Anda belum dibuka untuk memilih.',
-            ]);
+            $validator->errors()->add('nisn', 'Kelas Anda belum dibuka untuk memilih.');
+            throw new \Illuminate\Validation\ValidationException($validator);
         }
 
         // Periode aktif
         $period = ElectionPeriod::where('is_active', true)->first();
         if (! $period) {
-            return back()->withErrors(['nisn' => 'Pemilihan belum dibuka.']);
+            $validator->errors()->add('nisn', 'Pemilihan belum dibuka.');
+            throw new \Illuminate\Validation\ValidationException($validator);
         }
 
         // Filter 3: Belum memilih
@@ -79,7 +100,8 @@ class VoterAuthController extends Controller
             ->where('period_id', $period->id)
             ->exists();
         if ($already) {
-            return back()->withErrors(['nisn' => 'Anda sudah memberikan suara.']);
+            $validator->errors()->add('nisn', 'Anda sudah memberikan suara.');
+            throw new \Illuminate\Validation\ValidationException($validator);
         }
 
         // Login berhasil — simpan identitas di session
