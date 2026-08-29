@@ -56,10 +56,11 @@ class VoterAuthController extends Controller
     {
         $nisn = preg_replace('/\D/', '', (string) $request->input('nisn'));
 
-        // Validasi NISN wajib diisi & berupa angka 10 digit.
+        // Validasi NISN wajib diisi & angka 8-10 digit
+        // (data siswa dari CSV punya NISN bervariasi panjangnya).
         $validator = \Illuminate\Support\Facades\Validator::make(
             ['nisn' => $nisn],
-            ['nisn' => 'required|digits:10'],
+            ['nisn' => 'required|digits_between:8,10'],
         );
         if ($validator->fails()) {
             throw new \Illuminate\Validation\ValidationException($validator);

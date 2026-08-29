@@ -7,6 +7,7 @@ export default function Vote({ studentName, candidates }) {
     const [justSelected, setJustSelected] = useState(false);
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
+    const [showConfirm, setShowConfirm] = useState(false);
 
     // Flash error dari backend (mis. "Calon tidak valid")
     const pageErrors = usePage().props.errors || {};
@@ -27,11 +28,20 @@ export default function Vote({ studentName, candidates }) {
         setSelected(n);
     };
 
-    const confirm = () => {
+    // Buka popup konfirmasi (sebelum benar-benar mengirim suara)
+    const openConfirm = () => {
+        if (!selected || sending) return;
+        setShowConfirm(true);
+    };
+
+    const closeConfirm = () => setShowConfirm(false);
+
+    const submitVote = () => {
         if (!selected || sending) return;
         const chosen = candidates.find((c) => c.number === selected);
         if (!chosen) return;
 
+        setShowConfirm(false);
         setSending(true);
         setError('');
 
@@ -54,6 +64,9 @@ export default function Vote({ studentName, candidates }) {
     const logout = () => {
         router.post('/voter/logout');
     };
+
+    // Paslon terpilih untuk ditampilkan di popup konfirmasi
+    const chosen = candidates.find((c) => c.number === selected) || null;
 
     return (
         <GuestLikeLayout>
@@ -128,7 +141,7 @@ export default function Vote({ studentName, candidates }) {
                 <div className="mt-10 flex flex-col items-center justify-center gap-3">
                     <button
                         type="button"
-                        onClick={confirm}
+                        onClick={openConfirm}
                         disabled={!selected || sending}
                         className={
                             'w-full max-w-xs rounded-xl px-6 py-3 text-base font-semibold text-white shadow-lg transition ' +
@@ -145,6 +158,119 @@ export default function Vote({ studentName, candidates }) {
                     </button>
                 </div>
             </div>
+
+            {/* Popup konfirmasi sebelum mengirim suara */}
+            {showConfirm && chosen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-emerald-900/40 px-4 backdrop-blur-sm"
+                    onClick={closeConfirm}
+                >
+                    <div
+                        className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header popup */}
+                        <div className="bg-emerald-600 px-6 py-4 text-center">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-emerald-100">
+                                Konfirmasi Pilihan
+                            </p>
+                            <h2 className="mt-1 text-xl font-extrabold text-white">
+                                Apakah Anda yakin?
+                            </h2>
+                        </div>
+
+                        {/* Isi: foto + nama paslon terpilih */}
+                        <div className="px-6 py-6">
+                            <p className="mb-4 text-center text-sm text-emerald-700/80">
+                                Anda akan memilih Paslon {chosen.number}
+                            </p>
+
+                            <div className="flex items-center justify-center gap-4">
+                                {/* Capres */}
+                                <div className="flex flex-col items-center">
+                                    <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border-2 border-emerald-200 bg-emerald-50 shadow-inner">
+                                        {chosen.capres.photo ? (
+                                            <img
+                                                src={chosen.capres.photo}
+                                                alt={chosen.capres.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-xl font-semibold text-emerald-600">
+                                                {chosen.capres.name
+                                                    .split(' ')
+                                                    .map((w) => w[0])
+                                                    .slice(0, 2)
+                                                    .join('')
+                                                    .toUpperCase()}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="mt-2 text-sm font-semibold text-gray-800">
+                                        {chosen.capres.name}
+                                    </span>
+                                    <span className="text-xs text-gray-400">Calon 1</span>
+                                </div>
+
+                                <span className="pb-8 text-2xl font-light text-emerald-300">
+                                    &amp;
+                                </span>
+
+                                {/* Cawapres */}
+                                <div className="flex flex-col items-center">
+                                    <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border-2 border-emerald-200 bg-emerald-50 shadow-inner">
+                                        {chosen.cawapres.photo ? (
+                                            <img
+                                                src={chosen.cawapres.photo}
+                                                alt={chosen.cawapres.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-xl font-semibold text-emerald-600">
+                                                {chosen.cawapres.name
+                                                    .split(' ')
+                                                    .map((w) => w[0])
+                                                    .slice(0, 2)
+                                                    .join('')
+                                                    .toUpperCase()}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="mt-2 text-sm font-semibold text-gray-800">
+                                        {chosen.cawapres.name}
+                                    </span>
+                                    <span className="text-xs text-gray-400">Calon 2</span>
+                                </div>
+                            </div>
+
+                            {chosen.motto && (
+                                <p className="mt-4 text-center text-sm italic text-gray-500">
+                                    &ldquo;{chosen.motto}&rdquo;
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Tombol aksi */}
+                        <div className="flex gap-3 border-t border-emerald-100 px-6 py-4">
+                            <button
+                                type="button"
+                                onClick={closeConfirm}
+                                className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                type="button"
+                                onClick={submitVote}
+                                disabled={sending}
+                                className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-emerald-700 disabled:opacity-60"
+                            >
+                                {sending ? 'Mengirim...' : 'Ya, Pilih'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </GuestLikeLayout>
     );
 }

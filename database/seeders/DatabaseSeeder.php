@@ -42,59 +42,68 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 3. 3 Paslon (dengan foto Unsplash sebagai placeholder)
+        // 3. 2 Paslon (foto dari resources/img -> public/img)
         $candidates = [
             [
-                'number' => 1, 'name' => 'Budi & Ani',
-                'capres_name' => 'Budi Santoso', 'cawapres_name' => 'Ani Wijaya',
-                'capres_photo' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&h=160&q=80',
-                'cawapres_photo' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&h=160&q=80',
+                'number' => 1, 'name' => 'Alif & Nahlatusyifa',
+                'capres_name' => 'Alif Pratama Tampilang', 'cawapres_name' => 'Nahlatusyifa Djau',
+                'capres_photo' => '/img/paslon1a.jpg',
+                'cawapres_photo' => '/img/paslon1b.jpg',
                 'color' => '#059669',
             ],
             [
-                'number' => 2, 'name' => 'Dewi & Rudi',
-                'capres_name' => 'Rudi Pratama', 'cawapres_name' => 'Dewi Lestari',
-                'capres_photo' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&h=160&q=80',
-                'cawapres_photo' => 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=160&h=160&q=80',
+                'number' => 2, 'name' => 'Asyifa & Fatih',
+                'capres_name' => 'Asyifa Modanggu', 'cawapres_name' => 'Muhammad Fathir',
+                'capres_photo' => '/img/paslon2a.jpg',
+                'cawapres_photo' => '/img/paslon2b.png',
                 'color' => '#10b981',
-            ],
-            [
-                'number' => 3, 'name' => 'Siti & Eko',
-                'capres_name' => 'Eko Saputra', 'cawapres_name' => 'Siti Nurhaliza',
-                'capres_photo' => 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=160&h=160&q=80',
-                'cawapres_photo' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&h=160&q=80',
-                'color' => '#34d399',
             ],
         ];
         foreach ($candidates as $c) {
             Candidate::create(array_merge(['period_id' => $period->id], $c));
         }
 
-        // 4. Siswa ~320 orang, tersebar di kelas yang ADA (terbuka & tertutup)
-        $allClasses = ClassRoom::all();
-        $students = [];
-        for ($i = 0; $i < 320; $i++) {
-            $cls = $allClasses->random();
-            $students[] = Student::create([
-                'class_id' => $cls->id,
-                'nisn' => (string) fake()->unique()->numerify('##########'),
-                'name' => fake()->name(),
-            ]);
+        // 4. Impor siswa ASLI dari CSV (Data Siswa - Sheet5.csv & Data Siswa - X.csv)
+        //    Struktur: nama,nisn,kelas — tanpa header.
+        //    Hapus dulu 14 kelas dummy dari migration agar tidak numpuk,
+        //    lalu buat kelas dari kode unik di CSV + siswanya.
+        ClassRoom::query()->delete();
+        $classMap = [];
+        $csvFiles = [
+            base_path('Data Siswa - Sheet5.csv'),
+            base_path('Data Siswa - X.csv'),
+        ];
+        foreach ($csvFiles as $csvPath) {
+            if (! is_file($csvPath) || ($fh = fopen($csvPath, 'r')) === false) {
+                continue;
+            }
+            while (($row = fgetcsv($fh)) !== false) {
+                if (count($row) < 3) {
+                    continue;
+                }
+                $name = trim($row[0]);
+                $nisn = trim($row[1]);
+                $code = trim($row[2]);
+                if ($name === '' || $nisn === '') {
+                    continue;
+                }
+                if (! isset($classMap[$code])) {
+                    $classMap[$code] = ClassRoom::create([
+                        'code' => $code,
+                        'name' => $code,
+                        'is_open' => true,
+                    ]);
+                }
+                Student::create([
+                    'class_id' => $classMap[$code]->id,
+                    'nisn' => $nisn,
+                    'name' => $name,
+                ]);
+            }
+            fclose($fh);
         }
 
-        // 5. Sebagian siswa sudah memilih (hanya dari kelas terbuka)
-        $openClassIds = ClassRoom::where('is_open', true)->pluck('id');
-        $openStudentIds = Student::whereIn('class_id', $openClassIds)->pluck('id');
-        $chosen = $openStudentIds->random((int) ($openStudentIds->count() * 0.6));
-        $candidateIds = Candidate::where('period_id', $period->id)->pluck('id');
-        foreach ($chosen as $sid) {
-            Vote::create([
-                'student_id' => $sid,
-                'candidate_id' => $candidateIds->random(),
-                'period_id' => $period->id,
-                'voted_at' => now()->subMinutes(rand(1, 600)),
-            ]);
-        }
+        // 5. (Tidak ada vote awal — data asli, belum ada yang memilih)
 
         // 6. Admin default (NISN 0011223344 → login lewat form pemilih ke /admin)
         Admin::create([
