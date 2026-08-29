@@ -92,6 +92,102 @@ class AdminController extends Controller
     }
 
     /**
+     * Halaman daftar seluruh peserta + status vote mereka (dengan paginasi,
+     * sort, dan live search).
+     */
+    public function participants(Request $request): Response
+    {
+        $period = ElectionPeriod::where('is_active', true)->first();
+        $periodId = $period?->id;
+
+        $perPage = 50;
+
+        $query = Student::with('class')
+            ->orderBy('class_id')
+            ->orderBy('name');
+
+        // Live search: nisn / nama / kelas
+        $search = trim((string) $request->input('search'));
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nisn', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhereHas('class', function ($c) use ($search) {
+                        $c->where('code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Sort: name | kelas | status
+        $sort = $request->input('sort', 'kelas'); // default kelas (sudah di-orderBy class_id+name)
+        $dir = strtolower($request->input('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        if ($sort === 'name') {
+            $query = $query->reorder()->orderBy('name', $dir);
+        } elseif ($sort === 'kelas') {
+            $query = $query->reorder()->orderBy('class_id', $dir)->orderBy('name', 'asc');
+        } elseif ($sort === 'status') {
+            // status: belum memilih (0) dulu / sudah memilih (1)
+            // pakai withCount agar aman di MySQL strict (tanpa GROUP BY manual)
+            $query = $query->reorder()
+                ->withCount([
+                    'votes as vote_count' => function ($q) use ($periodId) {
+                        $q->where('period_id', $periodId);
+                    },
+                ])
+                ->orderBy('vote_count', $dir);
+        }
+
+        $students = $query->paginate($perPage, ['id', 'nisn', 'name', 'class_id'])
+            ->through(function (Student $s) use ($periodId) {
+                return [
+                    'id' => $s->id,
+                    'nisn' => $s->nisn,
+                    'name' => $s->name,
+                    'kelas' => $s->class?->code ?? '-',
+                    'has_voted' => $periodId ? $s->hasVoted($periodId) : false,
+                ];
+            });
+
+        return Inertia::render('AdminParticipants', [
+            'participants' => $students,
+            'total' => Student::count(),
+            'sudah_memilih' => Vote::where('period_id', $periodId)->count(),
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $dir,
+            ],
+        ]);
+    }
+
+    /**
+     * Reset (hapus) suara milik satu peserta.
+     */
+    public function resetVote(Request $request, Student $student): RedirectResponse
+    {
+        $student->votes()->delete();
+
+        return back()->with('flash', [
+            'type' => 'success',
+            'message' => "Suara {$student->name} berhasil direset.",
+        ]);
+    }
+
+    /**
+     * Reset (hapus) SELURUH suara peserta.
+     */
+    public function resetAllVotes(Request $request): RedirectResponse
+    {
+        Vote::query()->delete();
+
+        return back()->with('flash', [
+            'type' => 'success',
+            'message' => 'Seluruh suara peserta berhasil direset.',
+        ]);
+    }
+
+    /**
      * Logout admin (guard "admin") → kembali ke halaman login pemilih.
      */
     public function logout(Request $request): RedirectResponse

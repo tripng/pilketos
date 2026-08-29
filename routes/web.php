@@ -36,6 +36,15 @@ Route::middleware('auth.admin')->group(function () {
 
     Route::post('/admin/kelas/{classRoom}/toggle', [ClassRoomController::class, 'toggle'])
         ->name('admin.classes.toggle');
+
+    Route::get('/admin/peserta', [AdminController::class, 'participants'])
+        ->name('admin.participants');
+
+    Route::post('/admin/peserta/{student}/reset', [AdminController::class, 'resetVote'])
+        ->name('admin.participants.reset');
+
+    Route::post('/admin/peserta/reset-all', [AdminController::class, 'resetAllVotes'])
+        ->name('admin.participants.resetAll');
 });
 
 Route::get('/dashboard', function () {

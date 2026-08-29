@@ -86,6 +86,28 @@ export default function AdminDashboard({ stats, votes, kelas, live }) {
                 </div>
             </header>
 
+            {/* Nav antar halaman admin */}
+            <nav className="mx-auto flex max-w-6xl gap-2 px-4 pb-3 sm:px-6">
+                <a
+                    href="/admin"
+                    className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition active:scale-95"
+                >
+                    Dashboard
+                </a>
+                <a
+                    href="/admin/kelas"
+                    className="rounded-lg px-3 py-1.5 text-sm font-semibold text-emerald-700/80 transition hover:bg-emerald-50 hover:text-emerald-800 active:scale-95"
+                >
+                    Kelas
+                </a>
+                <a
+                    href="/admin/peserta"
+                    className="rounded-lg px-3 py-1.5 text-sm font-semibold text-emerald-700/80 transition hover:bg-emerald-50 hover:text-emerald-800 active:scale-95"
+                >
+                    Peserta
+                </a>
+            </nav>
+
             <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
                 {/* Stat cards */}
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
