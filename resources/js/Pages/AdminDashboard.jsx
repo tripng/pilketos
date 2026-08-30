@@ -6,7 +6,7 @@ import VoteDonut from '@/Components/admin/VoteDonut';
 import VoteBars from '@/Components/admin/VoteBars';
 import KelasBars from '@/Components/admin/KelasBars';
 
-export default function AdminDashboard({ stats, votes, kelas, live }) {
+export default function AdminDashboard({ stats, votes, kelas, live, access_token }) {
     const [voteData, setVoteData] = useState(votes);
     const [lastIncreased, setLastIncreased] = useState(null);
     const [pulse, setPulse] = useState(0);
@@ -109,6 +109,40 @@ export default function AdminDashboard({ stats, votes, kelas, live }) {
             </nav>
 
             <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+                {/* Token akses global untuk seluruh siswa */}
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h2 className="text-base font-semibold text-amber-900">
+                                Token Akses Pemilih
+                            </h2>
+                            <p className="mt-1 text-sm text-amber-700/80">
+                                Token ini wajib dimasukkan siswa saat login (selain NISN). Berlaku untuk seluruh siswa.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                if (confirm('Reset token? Token lama tidak akan berlaku lagi.')) {
+                                    router.post('/admin/token/reset');
+                                }
+                            }}
+                            className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-700 active:scale-95"
+                        >
+                            Reset Token
+                        </button>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2">
+                        <code className="select-all rounded-lg bg-white px-4 py-2 font-mono text-lg tracking-widest text-amber-900 ring-1 ring-amber-200">
+                            {access_token || '—'}
+                        </code>
+                        <button
+                            onClick={() => navigator.clipboard?.writeText(access_token || '')}
+                            className="rounded-lg border border-amber-300 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100"
+                        >
+                            Salin
+                        </button>
+                    </div>
+                </div>
                 {/* Stat cards */}
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                     <StatCard

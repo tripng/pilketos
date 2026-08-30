@@ -4,6 +4,7 @@ import KemenagLogo from '@/Components/KemenagLogo';
 export default function VoterLogin() {
     const { data, setData, post, processing, errors } = useForm({
         nisn: '',
+        token: '',
     });
 
     const submit = (e) => {
@@ -41,12 +42,12 @@ export default function VoterLogin() {
                             id="nisn"
                             type="text"
                             inputMode="numeric"
-                            maxLength={10}
+                            maxLength={12}
                             value={data.nisn}
                             onChange={(e) =>
                                 setData('nisn', e.target.value.replace(/\D/g, ''))
                             }
-                            placeholder="Masukkan 10 digit NISN"
+                            placeholder="Masukkan NISN (8-12 digit)"
                             className="mt-1 block w-full rounded-xl border-emerald-200 bg-emerald-50/40 px-4 py-3 text-center text-lg tracking-widest text-emerald-900 shadow-sm outline-none ring-emerald-400 transition focus:border-emerald-400 focus:bg-white focus:ring-2"
                         />
                     </div>
@@ -57,9 +58,32 @@ export default function VoterLogin() {
                         </p>
                     )}
 
+                    <div className="mt-4">
+                        <label
+                            htmlFor="token"
+                            className="block text-sm font-medium text-emerald-800"
+                        >
+                            Token
+                        </label>
+                        <input
+                            id="token"
+                            type="text"
+                            value={data.token}
+                            onChange={(e) => setData('token', e.target.value)}
+                            placeholder="Masukkan token akses"
+                            className="mt-1 block w-full rounded-xl border-emerald-200 bg-emerald-50/40 px-4 py-3 text-center text-lg tracking-widest text-emerald-900 shadow-sm outline-none ring-emerald-400 transition focus:border-emerald-400 focus:bg-white focus:ring-2"
+                        />
+                    </div>
+
+                    {errors.token && (
+                        <p className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-center text-sm font-medium text-rose-600">
+                            {errors.token}
+                        </p>
+                    )}
+
                     <button
                         type="submit"
-                        disabled={processing || data.nisn.length === 0}
+                        disabled={processing || data.nisn.length === 0 || data.token.length === 0}
                         className="mt-6 w-full rounded-xl bg-emerald-600 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:bg-emerald-700 hover:shadow-emerald-300/50 disabled:opacity-50"
                     >
                         {processing ? 'Memproses...' : 'Masuk'}

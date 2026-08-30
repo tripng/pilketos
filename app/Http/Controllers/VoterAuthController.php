@@ -56,23 +56,43 @@ class VoterAuthController extends Controller
     {
         $nisn = preg_replace('/\D/', '', (string) $request->input('nisn'));
 
-        // Validasi NISN wajib diisi & angka 8-10 digit
-        // (data siswa dari CSV punya NISN bervariasi panjangnya).
+        // Validasi NISN wajib diisi & angka 8-12 digit
+        // (data siswa asli 8-10 digit; siswa cadangan 12 digit).
         $validator = \Illuminate\Support\Facades\Validator::make(
             ['nisn' => $nisn],
-            ['nisn' => 'required|digits_between:8,10'],
+            ['nisn' => 'required|digits_between:8,12'],
         );
         if ($validator->fails()) {
             throw new \Illuminate\Validation\ValidationException($validator);
         }
 
+        // Rotasi token otomatis tiap 2 menit (tanpa cron) — dipanggil tiap
+        // request login. Token lama otomatis diganti jika sudah lewat 2 menit.
+        $period = ElectionPeriod::where('is_active', true)->first();
+        if ($period) {
+            $period->ensureFreshToken(2);
+        }
+
         // Filter 0: NISN ini milik admin? → login sebagai admin lalu ke panel.
+        // Admin BEBAS token (hanya siswa yang wajib token).
         $admin = Admin::where('nisn', $nisn)->first();
         if ($admin) {
             Auth::guard('admin')->login($admin);
             $request->session()->regenerate();
+            // Tulis session ke store seketika agar tersedia pada request berikutnya.
+            $request->session()->save();
 
             return redirect()->route('admin.dashboard');
+        }
+
+        // Token global wajib & harus cocok dengan token periode aktif (khusus siswa).
+        // Ini murni session Laravel (bukan JWT) — token hanya "kunci" yang
+        // dicek cocok sebelum siswa diizinkan login.
+        $token = (string) $request->input('token');
+        $period = ElectionPeriod::where('is_active', true)->first();
+        if (! $period || ! $period->access_token || ! \hash_equals($period->access_token, $token)) {
+            $validator->errors()->add('token', 'Token tidak valid.');
+            throw new \Illuminate\Validation\ValidationException($validator);
         }
 
         $student = Student::where('nisn', $nisn)->first();

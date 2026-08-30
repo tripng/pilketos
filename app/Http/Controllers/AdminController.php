@@ -21,7 +21,10 @@ class AdminController extends Controller
     public function dashboard(Request $request): Response
     {
         $period = ElectionPeriod::where('is_active', true)->first();
-
+        // Rotasi token otomatis tiap 2 menit — admin selalu lihat token terkini.
+        if ($period) {
+            $period->ensureFreshToken(2);
+        }
         // Total seluruh siswa terdaftar
         $totalSiswa = Student::count();
 
@@ -88,6 +91,7 @@ class AdminController extends Controller
             'votes' => $votes,
             'kelas' => $kelas,
             'live' => true,
+            'access_token' => $period?->access_token,
         ]);
     }
 
@@ -198,5 +202,28 @@ class AdminController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    /**
+     * Reset (generate ulang) token akses global untuk seluruh siswa.
+     * Token baru akan menggantikan yang lama — siswa harus pakai token baru
+     * untuk login. Menggunakan native session Laravel (bukan JWT).
+     */
+    public function resetToken(Request $request): RedirectResponse
+    {
+        $period = ElectionPeriod::where('is_active', true)->firstOrFail();
+        // Generate token 4 huruf A-Z baru + catat waktu rotasi.
+        $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $token = '';
+        for ($i = 0; $i < 4; $i++) {
+            $token .= $chars[random_int(0, 25)];
+        }
+        $period->access_token = $token;
+        $period->token_rotated_at = now();
+        $period->save();
+
+        return redirect()
+            ->route('admin.dashboard')
+            ->with('success', 'Token akses berhasil di-reset. Bagikan token baru ke seluruh siswa.');
     }
 }

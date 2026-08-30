@@ -22,6 +22,16 @@ class DatabaseSeeder extends Seeder
             'name' => 'IMUT 2026',
             'year' => 2026,
             'is_active' => true,
+            // Token global untuk seluruh siswa (login butuh NISN + token ini).
+            // Bukan JWT — murni session Laravel. 4 huruf uppercase (A-Z).
+            'access_token' => (function () {
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $t = '';
+                for ($i = 0; $i < 4; $i++) {
+                    $t .= $chars[random_int(0, 25)];
+                }
+                return $t;
+            })(),
             'opened_at' => now(),
             'closed_at' => null,
         ]);

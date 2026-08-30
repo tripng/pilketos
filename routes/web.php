@@ -45,6 +45,9 @@ Route::middleware('auth.admin')->group(function () {
 
     Route::post('/admin/peserta/reset-all', [AdminController::class, 'resetAllVotes'])
         ->name('admin.participants.resetAll');
+
+    Route::post('/admin/token/reset', [AdminController::class, 'resetToken'])
+        ->name('admin.token.reset');
 });
 
 Route::get('/dashboard', function () {
