@@ -4,10 +4,7 @@ export default function CandidateCard({
     number,
     capres,
     capresPhoto,
-    capresPhotoHappy,
     cawapres,
-    cawapresPhoto,
-    cawapresPhotoHappy,
     motto,
     color = '#059669',
     selected = false,
@@ -21,9 +18,8 @@ export default function CandidateCard({
             .join('')
             .toUpperCase();
 
-    // Foto capres/cawapres (pakai happy kalau terpilih)
-    const c1 = selected ? capresPhotoHappy || capresPhoto : capresPhoto;
-    const c2 = selected ? cawapresPhotoHappy || cawapresPhoto : cawapresPhoto;
+    // Foto pasangan (pakai capresPhoto sebagai foto pasangan)
+    const photo = capresPhoto;
 
     return (
         <div
@@ -75,58 +71,27 @@ export default function CandidateCard({
                 Paslon {number}
             </span>
 
-            {/* Foto dua calon (persegi) */}
-            <div className="mt-4 flex items-center justify-center gap-3">
-                <div className="flex flex-col items-center">
-                    <div
-                        className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border-2 border-emerald-100 bg-emerald-50 shadow-inner"
-                        style={{ borderColor: selected ? color : undefined }}
-                    >
-                        {c1 ? (
-                            <img
-                                src={c1}
-                                alt={capres}
-                                className="h-full w-full object-cover"
-                            />
-                        ) : (
-                            <span className="text-xl font-semibold text-emerald-600">
-                                {initials(capres)}
-                            </span>
-                        )}
-                    </div>
-                    <span className="mt-2 text-xs font-medium text-gray-500">
-                        Calon 1
-                    </span>
-                </div>
-
-                <span className="pb-6 text-2xl font-light text-emerald-300">
-                    &amp;
-                </span>
-
-                <div className="flex flex-col items-center">
-                    <div
-                        className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border-2 border-emerald-100 bg-emerald-50 shadow-inner"
-                        style={{ borderColor: selected ? color : undefined }}
-                    >
-                        {c2 ? (
-                            <img
-                                src={c2}
-                                alt={cawapres}
-                                className="h-full w-full object-cover"
-                            />
-                        ) : (
-                            <span className="text-xl font-semibold text-emerald-600">
-                                {initials(cawapres)}
-                            </span>
-                        )}
-                    </div>
-                    <span className="mt-2 text-xs font-medium text-gray-500">
-                        Calon 2
-                    </span>
+            {/* Foto pasangan (satu foto) */}
+            <div className="mt-4 flex items-center justify-center">
+                <div
+                    className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-2xl border-2 border-emerald-100 bg-emerald-50 shadow-inner"
+                    style={{ borderColor: selected ? color : undefined }}
+                >
+                    {photo ? (
+                        <img
+                            src={photo}
+                            alt={capres + ' & ' + cawapres}
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <span className="text-3xl font-semibold text-emerald-600">
+                            {initials(capres)}
+                        </span>
+                    )}
                 </div>
             </div>
 
-            {/* Nama */}
+            {/* Nama pasangan */}
             <div className="mt-4 text-center">
                 <h3 className="text-lg font-bold leading-tight text-gray-900">
                     {capres}

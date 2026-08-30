@@ -64,7 +64,7 @@ export default function AdminDashboard({ stats, votes, kelas, live }) {
                                 Dashboard Admin
                             </h1>
                             <p className="text-xs text-emerald-700/80">
-                                E-Voting &middot; Pilketos 2026
+                                IMUT &middot; Ingin Menentukan Pilihan Terbaik
                             </p>
                         </div>
                     </div>
@@ -140,7 +140,7 @@ export default function AdminDashboard({ stats, votes, kelas, live }) {
                 {/* Grafik suara + per kelas */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <Card
-                        title="Suara 4 Paslon (Live)"
+                        title="Suara 2 Paslon (Live)"
                         right={
                             <span className="text-xs font-medium text-emerald-600">
                                 Donut

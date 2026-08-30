@@ -35,7 +35,7 @@ export default function VoteDone({ studentName }) {
             </div>
 
             <p className="mt-6 text-center text-xs text-emerald-700/60">
-                Pilketos 2026 &middot; Sistem Pemungutan Suara Digital
+                IMUT 2026 &middot; Ingin Menentukan Pilihan Terbaik
             </p>
         </div>
     );

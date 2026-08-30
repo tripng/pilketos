@@ -74,40 +74,30 @@ export default function VoteBars({ data, lastIncreased }) {
                 })}
             </div>
 
-            {/* Foto paslon (capres & cawapres) di bawah grafik masing-masing */}
+            {/* Foto paslon (satu foto per paslon) di bawah grafik masing-masing */}
             <div className="flex justify-around gap-4 px-2">
                 {data.map((d) => {
                     const isHot = lastIncreased === d.number;
-                    // Foto "happy" bisa jadi kosong di DB — fallback ke foto biasa
-                    // agar <img> tidak jadi alt-text saat sebuah paslon dapat suara.
-                    const capresSrc = isHot
+                    const src = isHot
                         ? d.capres.photoHappy || d.capres.photo
                         : d.capres.photo;
-                    const cawapresSrc = isHot
-                        ? d.cawapres.photoHappy || d.cawapres.photo
-                        : d.cawapres.photo;
                     return (
                         <div
                             key={d.number}
                             className="relative flex flex-1 flex-col items-center"
                         >
-                            {/* Frame persegi berisi 2 foto (capres + cawapres) */}
+                            {/* Frame persegi berisi 1 foto pasangan */}
                             <div
                                 className={
-                                    'grid h-24 w-24 grid-cols-2 overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-300 ' +
+                                    'h-24 w-24 overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-300 ' +
                                     (isHot
                                         ? 'scale-110 -rotate-2 border-amber-400 ring-2 ring-amber-300'
                                         : 'scale-100 border-emerald-200')
                                 }
                             >
                                 <img
-                                    src={capresSrc}
-                                    alt={`Capres Paslon ${d.number}`}
-                                    className="h-full w-full object-cover"
-                                />
-                                <img
-                                    src={cawapresSrc}
-                                    alt={`Cawapres Paslon ${d.number}`}
+                                    src={src}
+                                    alt={`Paslon ${d.number}`}
                                     className="h-full w-full object-cover"
                                 />
                             </div>

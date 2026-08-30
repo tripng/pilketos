@@ -139,7 +139,7 @@ export default function AdminParticipants({ participants, total, sudah_memilih, 
                                 Daftar Peserta
                             </h1>
                             <p className="text-xs text-emerald-700/80">
-                                E-Voting &middot; Pilketos 2026
+                                IMUT &middot; Ingin Menentukan Pilihan Terbaik
                             </p>
                         </div>
                     </div>

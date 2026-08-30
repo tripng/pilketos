@@ -12,7 +12,7 @@ class ElectionPeriodFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'Pilketos ' . fake()->year(),
+            'name' => 'IMUT ' . fake()->year(),
             'year' => fake()->year(),
             'is_active' => true,
             'opened_at' => now(),

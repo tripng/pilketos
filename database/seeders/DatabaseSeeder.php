@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Periode pemilihan aktif
         $period = ElectionPeriod::create([
-            'name' => 'Pilketos 2026',
+            'name' => 'IMUT 2026',
             'year' => 2026,
             'is_active' => true,
             'opened_at' => now(),
@@ -47,16 +47,16 @@ class DatabaseSeeder extends Seeder
             [
                 'number' => 1, 'name' => 'Alif & Nahlatusyifa',
                 'capres_name' => 'Alif Pratama Tampilang', 'cawapres_name' => 'Nahlatusyifa Djau',
-                'capres_photo' => '/img/paslon1a.jpg',
-                'cawapres_photo' => '/img/paslon1b.jpg',
+                'capres_photo' => '/img/paslon1.png',
+                'cawapres_photo' => '/img/paslon1.png',
                 'color' => '#059669',
             ],
             [
                 'number' => 2, 'name' => 'Asyifa & Fatih',
                 'capres_name' => 'Asyifa Modanggu', 'cawapres_name' => 'Muhammad Fathir',
-                'capres_photo' => '/img/paslon2a.jpg',
-                'cawapres_photo' => '/img/paslon2b.png',
-                'color' => '#10b981',
+                'capres_photo' => '/img/paslon2.png',
+                'cawapres_photo' => '/img/paslon2.png',
+                'color' => '#0d9488',
             ],
         ];
         foreach ($candidates as $c) {
@@ -101,6 +101,40 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
             fclose($fh);
+        }
+
+        // 4b. Tambah 3 siswa CADANGAN per kelas (untuk keperluan uji/voting cadangan).
+        //     Nama: cadangan{KODE}a / b / c. NISN 12 digit unik ber-prefix 99
+        //     (mustahil bentrok dengan NISN asli yang hanya 8-10 digit).
+        $classIdx = 0;
+        foreach ($classMap as $code => $room) {
+            $classIdx++;
+            for ($s = 1; $s <= 3; $s++) {
+                $suffix = ['a', 'b', 'c'][$s - 1];
+                Student::create([
+                    'class_id' => $room->id,
+                    'nisn' => '99' . str_pad($classIdx, 2, '0', STR_PAD_LEFT)
+                        . str_pad($s, 8, '0', STR_PAD_LEFT),
+                    'name' => 'cadangan' . $code . $suffix,
+                ]);
+            }
+        }
+
+        // 4c. Siswa tambahan ke kelas X.15 (belum punya NIM/NISN → generate unik).
+        //     NISN 12 digit ber-prefix 9915 (kode kelas X.15) + sequence.
+        if (isset($classMap['X.15'])) {
+            $extra = [
+                ['LATIFA AFRINA DJAFAR', '9915000001'],
+                ['LARASATI LAIKO', '9915000002'],
+                ['SUFAIRA LEONI PAKAYA', '9915000003'],
+            ];
+            foreach ($extra as $e) {
+                Student::create([
+                    'class_id' => $classMap['X.15']->id,
+                    'nisn' => $e[1],
+                    'name' => $e[0],
+                ]);
+            }
         }
 
         // 5. (Tidak ada vote awal — data asli, belum ada yang memilih)

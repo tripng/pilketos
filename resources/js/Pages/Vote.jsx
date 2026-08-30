@@ -88,7 +88,7 @@ export default function Vote({ studentName, candidates }) {
                 {/* Header */}
                 <div className="mb-10 text-center">
                     <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600">
-                        Pilketos 2026
+                        IMUT 2026
                     </p>
                     <h1
                         className={
@@ -125,10 +125,7 @@ export default function Vote({ studentName, candidates }) {
                             number={c.number}
                             capres={c.capres.name}
                             capresPhoto={c.capres.photo}
-                            capresPhotoHappy={c.capres.photoHappy}
                             cawapres={c.cawapres.name}
-                            cawapresPhoto={c.cawapres.photo}
-                            cawapresPhotoHappy={c.cawapres.photoHappy}
                             motto={c.motto}
                             color={c.color}
                             selected={selected === c.number}
@@ -186,17 +183,17 @@ export default function Vote({ studentName, candidates }) {
                             </p>
 
                             <div className="flex items-center justify-center gap-4">
-                                {/* Capres */}
+                                {/* Foto pasangan (satu foto) */}
                                 <div className="flex flex-col items-center">
-                                    <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border-2 border-emerald-200 bg-emerald-50 shadow-inner">
+                                    <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-2xl border-2 border-emerald-200 bg-emerald-50 shadow-inner">
                                         {chosen.capres.photo ? (
                                             <img
                                                 src={chosen.capres.photo}
-                                                alt={chosen.capres.name}
+                                                alt={chosen.capres.name + ' & ' + chosen.cawapres.name}
                                                 className="h-full w-full object-cover"
                                             />
                                         ) : (
-                                            <span className="text-xl font-semibold text-emerald-600">
+                                            <span className="text-2xl font-semibold text-emerald-600">
                                                 {chosen.capres.name
                                                     .split(' ')
                                                     .map((w) => w[0])
@@ -209,37 +206,9 @@ export default function Vote({ studentName, candidates }) {
                                     <span className="mt-2 text-sm font-semibold text-gray-800">
                                         {chosen.capres.name}
                                     </span>
-                                    <span className="text-xs text-gray-400">Calon 1</span>
-                                </div>
-
-                                <span className="pb-8 text-2xl font-light text-emerald-300">
-                                    &amp;
-                                </span>
-
-                                {/* Cawapres */}
-                                <div className="flex flex-col items-center">
-                                    <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border-2 border-emerald-200 bg-emerald-50 shadow-inner">
-                                        {chosen.cawapres.photo ? (
-                                            <img
-                                                src={chosen.cawapres.photo}
-                                                alt={chosen.cawapres.name}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-xl font-semibold text-emerald-600">
-                                                {chosen.cawapres.name
-                                                    .split(' ')
-                                                    .map((w) => w[0])
-                                                    .slice(0, 2)
-                                                    .join('')
-                                                    .toUpperCase()}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="mt-2 text-sm font-semibold text-gray-800">
-                                        {chosen.cawapres.name}
+                                    <span className="text-xs text-gray-400">
+                                        &amp; {chosen.cawapres.name}
                                     </span>
-                                    <span className="text-xs text-gray-400">Calon 2</span>
                                 </div>
                             </div>
 

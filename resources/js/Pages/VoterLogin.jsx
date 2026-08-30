@@ -24,11 +24,9 @@ export default function VoterLogin() {
             <div className="w-full max-w-md overflow-hidden rounded-2xl border border-emerald-100 bg-white px-8 py-8 shadow-lg shadow-emerald-200/50">
                 <div className="mb-6 text-center">
                     <h1 className="text-2xl font-extrabold text-emerald-800">
-                        E&#8209;Voting
+                        IMUT
                     </h1>
-                    <p className="mt-1 text-sm text-emerald-700/80">
-                        Masuk menggunakan NISN untuk memberikan suara
-                    </p>
+                    <p className="text-sm text-emerald-800">"Ingin Menentukan Pilihan Terbaik"</p>
                 </div>
 
                 <form onSubmit={submit}>
@@ -75,7 +73,7 @@ export default function VoterLogin() {
             </div>
 
             <p className="mt-6 text-center text-xs text-emerald-700/60">
-                Pilketos 2026 &middot; Sistem Pemungutan Suara Digital
+                IMUT 2026 &middot; Ingin Menentukan Pilihan Terbaik
             </p>
         </div>
     );

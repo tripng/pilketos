@@ -49,7 +49,7 @@ export default function ClassSettings({ classes: initialClasses }) {
                             Pengaturan Kelas
                         </h1>
                         <p className="text-sm text-emerald-600">
-                            E-Voting · Pilketos 2026
+                            IMUT · Ingin Menentukan Pilihan Terbaik
                         </p>
                     </div>
                     <span className="ml-auto rounded-full bg-emerald-100 px-4 py-1.5 text-sm font-semibold text-emerald-700">

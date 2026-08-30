@@ -1,4 +1,4 @@
-// Donut chart suara 4 paslon (SVG murni, data statis)
+// Donut chart suara 2 paslon (SVG murni, data statis)
 export default function VoteDonut({ data }) {
     const total = data.reduce((s, d) => s + d.votes, 0) || 1;
     const size = 200;
