@@ -1,6 +1,10 @@
 // Vertical bar chart perolehan 4 paslon dengan foto + animasi meriah saat naik
-export default function VoteBars({ data, lastIncreased }) {
+export default function VoteBars({ data, lastIncreased = [] }) {
     const max = Math.max(...data.map((d) => d.votes), 1);
+    // Normalisasi lastIncreased menjadi array of number (support multi-paslon)
+    const hotSet = Array.isArray(lastIncreased)
+        ? lastIncreased.map(Number)
+        : [Number(lastIncreased)];
 
     return (
         <div className="space-y-4">
@@ -8,7 +12,7 @@ export default function VoteBars({ data, lastIncreased }) {
             <div className="flex h-56 items-end justify-around gap-4 px-2">
                 {data.map((d) => {
                     const pct = (d.votes / max) * 100;
-                    const isHot = lastIncreased === d.number;
+                    const isHot = hotSet.includes(d.number);
                     return (
                         <div
                             key={d.number}
@@ -17,7 +21,7 @@ export default function VoteBars({ data, lastIncreased }) {
                             {/* Angka suara — meledak saat naik */}
                             <span
                                 className={
-                                    'mb-2 text-lg font-extrabold tabular-nums transition-all duration-300 ' +
+                                    'mb-2 text-lg font-extrabold tabular-nums transition-all duration-[2000ms] ease-out ' +
                                     (isHot
                                         ? 'scale-150 text-amber-500 drop-shadow-[0_2px_5px_rgba(245,158,11,0.85)]'
                                         : 'scale-100 text-emerald-800')
@@ -58,7 +62,7 @@ export default function VoteBars({ data, lastIncreased }) {
                                 )}
                                 <div
                                     className={
-                                        'w-full rounded-t-xl transition-[height] duration-700 ease-out ' +
+                                        'w-full rounded-t-xl transition-[height] duration-[2000ms] ease-out ' +
                                         (isHot
                                             ? 'ring-4 ring-amber-400 shadow-[0_0_18px_4px_rgba(251,191,36,0.65)]'
                                             : '')
@@ -77,7 +81,7 @@ export default function VoteBars({ data, lastIncreased }) {
             {/* Foto paslon (satu foto per paslon) di bawah grafik masing-masing */}
             <div className="flex justify-around gap-4 px-2">
                 {data.map((d) => {
-                    const isHot = lastIncreased === d.number;
+                    const isHot = hotSet.includes(d.number);
                     const src = isHot
                         ? d.capres.photoHappy || d.capres.photo
                         : d.capres.photo;
@@ -89,7 +93,7 @@ export default function VoteBars({ data, lastIncreased }) {
                             {/* Frame persegi berisi 1 foto pasangan */}
                             <div
                                 className={
-                                    'h-24 w-24 overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-300 ' +
+                                    'h-24 w-24 overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-[2000ms] ease-out ' +
                                     (isHot
                                         ? 'scale-110 -rotate-2 border-amber-400 ring-2 ring-amber-300'
                                         : 'scale-100 border-emerald-200')

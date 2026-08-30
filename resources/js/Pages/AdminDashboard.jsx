@@ -8,9 +8,10 @@ import KelasBars from '@/Components/admin/KelasBars';
 
 export default function AdminDashboard({ stats, votes, kelas, live, access_token }) {
     const [voteData, setVoteData] = useState(votes);
-    const [lastIncreased, setLastIncreased] = useState(null);
+    const [lastIncreased, setLastIncreased] = useState([]);
     const [pulse, setPulse] = useState(0);
     const prevVotes = useRef(votes);
+    const hotTimeout = useRef(null);
     const adminName = usePage().props.auth?.admin?.username;
 
     const logout = () => {
@@ -19,21 +20,34 @@ export default function AdminDashboard({ stats, votes, kelas, live, access_token
 
     // Sinkronkan dengan props terbaru (mis. setelah polling)
     useEffect(() => {
-        // Deteksi paslon yang suaranya bertambah → trigger animasi pulse
-        let changed = null;
+        // Deteksi SELURUH paslon yang suaranya bertambah → array (keduanya animasi)
+        const changed = [];
         votes.forEach((v, i) => {
             const before = prevVotes.current[i]?.votes ?? 0;
-            if (v.votes > before) changed = v.number;
+            if (v.votes > before) changed.push(v.number);
         });
 
         setVoteData(votes);
         prevVotes.current = votes;
 
-        if (changed !== null) {
+        if (changed.length > 0) {
             setLastIncreased(changed);
             setPulse((p) => p + 1);
+
+            // Auto-clear setelah ~2 detik agar efek tidak tertahan (fade out).
+            if (hotTimeout.current) clearTimeout(hotTimeout.current);
+            hotTimeout.current = setTimeout(() => {
+                setLastIncreased([]);
+            }, 2000);
         }
     }, [votes]);
+
+    // Bersihkan timeout saat unmount.
+    useEffect(() => {
+        return () => {
+            if (hotTimeout.current) clearTimeout(hotTimeout.current);
+        };
+    }, []);
 
     // Polling live: ambil data terbaru dari DB tiap 3 detik
     useEffect(() => {

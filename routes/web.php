@@ -21,6 +21,10 @@ Route::post('/voter/login', [VoterAuthController::class, 'authenticate'])
 Route::post('/voter/logout', [VoterAuthController::class, 'logout'])
     ->name('voter.logout');
 
+// Halaman live hasil perolehan suara untuk umum (tanpa login/admin).
+Route::get('/live', [AdminController::class, 'liveResults'])
+    ->name('live.results');
+
 Route::get('/pilih', [VoteController::class, 'index'])
     ->name('vote');
 

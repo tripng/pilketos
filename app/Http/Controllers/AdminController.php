@@ -96,6 +96,82 @@ class AdminController extends Controller
     }
 
     /**
+     * Halaman live hasil perolehan suara untuk UMUM (tanpa auth).
+     * Menampilkan visualisasi yang sama dengan dashboard admin, tapi tanpa
+     * panel token/logout. Data di-poll tiap 3 detik lewat Inertia (only props),
+     * sehingga tidak ada double data / animasi crack.
+     */
+    public function liveResults(Request $request): Response
+    {
+        $period = ElectionPeriod::where('is_active', true)->first();
+
+        $totalSiswa = Student::count();
+
+        $votes = collect();
+        $sudahMemilih = 0;
+
+        if ($period) {
+            $sudahMemilih = Vote::where('period_id', $period->id)->count();
+
+            $votes = Candidate::orderBy('number')
+                ->get([
+                    'id',
+                    'number',
+                    'color',
+                    'capres_name',
+                    'capres_photo',
+                    'capres_photo_happy',
+                    'cawapres_name',
+                    'cawapres_photo',
+                    'cawapres_photo_happy',
+                ])
+                ->map(function (Candidate $c) use ($period) {
+                    return [
+                        'number' => $c->number,
+                        'color' => $c->color,
+                        'votes' => Vote::where('candidate_id', $c->id)
+                            ->where('period_id', $period->id)
+                            ->count(),
+                        'capres' => [
+                            'photo' => $c->capres_photo,
+                            'photoHappy' => $c->capres_photo_happy,
+                        ],
+                        'cawapres' => [
+                            'photo' => $c->cawapres_photo,
+                            'photoHappy' => $c->cawapres_photo_happy,
+                        ],
+                    ];
+                });
+        }
+
+        $belumMemilih = max($totalSiswa - $sudahMemilih, 0);
+        $partisipasi = $totalSiswa > 0
+            ? round(($sudahMemilih / $totalSiswa) * 100)
+            : 0;
+
+        $kelas = ClassRoom::orderBy('code')
+            ->get(['id', 'code'])
+            ->map(function (ClassRoom $c) {
+                return [
+                    'kelas' => $c->code,
+                    'count' => $c->students()->count(),
+                ];
+            });
+
+        return Inertia::render('LiveResults', [
+            'stats' => [
+                'total_siswa' => $totalSiswa,
+                'sudah_memilih' => $sudahMemilih,
+                'belum_memilih' => $belumMemilih,
+                'partisipasi' => $partisipasi,
+            ],
+            'votes' => $votes,
+            'kelas' => $kelas,
+            'live' => true,
+        ]);
+    }
+
+    /**
      * Halaman daftar seluruh peserta + status vote mereka (dengan paginasi,
      * sort, dan live search).
      */
