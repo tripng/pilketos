@@ -21,9 +21,9 @@ class AdminController extends Controller
     public function dashboard(Request $request): Response
     {
         $period = ElectionPeriod::where('is_active', true)->first();
-        // Rotasi token otomatis tiap 2 menit — admin selalu lihat token terkini.
+        // Rotasi token otomatis tiap 1 menit — semua halaman lihat token terkini.
         if ($period) {
-            $period->ensureFreshToken(2);
+            $period->ensureFreshToken(1);
         }
         // Total seluruh siswa terdaftar
         $totalSiswa = Student::count();
@@ -167,6 +167,36 @@ class AdminController extends Controller
             ],
             'votes' => $votes,
             'kelas' => $kelas,
+            'live' => true,
+            'access_token' => $period?->access_token,
+            'token_rotated_at' => $period?->token_rotated_at,
+            'token_expires_in' => $period && $period->token_rotated_at
+                ? max(0, 60 - (int) now()->diffInSeconds($period->token_rotated_at))
+                : 0,
+        ]);
+    }
+
+    /**
+     * Halaman publik /token — display token akses pemilih untuk
+     * ditampilkan di ruangan voting. Publik (semua orang) dapat lihat,
+     * tapi token cuma berlaku 1 menit lalu otomatis rotate.
+     * Polling tiap 5 detik via Inertia (only props) — tidak remount.
+     */
+    public function tokenDisplay(Request $request): Response
+    {
+        $period = ElectionPeriod::where('is_active', true)->first();
+        // Pastikan token selalu fresh (rotate tiap 1 menit) walaupun hanya via polling.
+        if ($period) {
+            $period->ensureFreshToken(1);
+            $period->refresh();
+        }
+
+        return Inertia::render('TokenDisplay', [
+            'access_token' => $period?->access_token ?? '-',
+            'token_rotated_at' => $period?->token_rotated_at,
+            'token_expires_in' => $period && $period->token_rotated_at
+                ? max(0, 60 - (int) now()->diffInSeconds($period->token_rotated_at))
+                : 0,
             'live' => true,
         ]);
     }

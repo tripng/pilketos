@@ -149,12 +149,12 @@ export default function AdminDashboard({ stats, votes, kelas, live, access_token
                         <code className="select-all rounded-lg bg-white px-4 py-2 font-mono text-lg tracking-widest text-amber-900 ring-1 ring-amber-200">
                             {access_token || '—'}
                         </code>
-                        <button
-                            onClick={() => navigator.clipboard?.writeText(access_token || '')}
+                        <a
+                            href="/token"
                             className="rounded-lg border border-amber-300 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100"
                         >
-                            Salin
-                        </button>
+                            Buka /token
+                        </a>
                     </div>
                 </div>
                 {/* Stat cards */}

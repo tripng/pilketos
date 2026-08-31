@@ -25,6 +25,11 @@ Route::post('/voter/logout', [VoterAuthController::class, 'logout'])
 Route::get('/live', [AdminController::class, 'liveResults'])
     ->name('live.results');
 
+// Halaman display token akses pemilih (untuk ditampilkan di ruangan voting).
+// PUBLIK — semua orang bisa lihat. Token otomatis rotate tiap 1 menit.
+Route::get('/token', [AdminController::class, 'tokenDisplay'])
+    ->name('token.display');
+
 Route::get('/pilih', [VoteController::class, 'index'])
     ->name('vote');
 

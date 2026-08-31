@@ -36,7 +36,7 @@ class ElectionPeriod extends Model
      * token berganti otomatis tiap periode tanpa bergantung cron.
      * (Bonus: scheduler `php artisan schedule` juga memanggil ini tiap menit.)
      */
-    public function ensureFreshToken(int $minutes = 2): void
+    public function ensureFreshToken(int $minutes = 1): void
     {
         $needRotate = $this->token_rotated_at === null
             || $this->access_token === null

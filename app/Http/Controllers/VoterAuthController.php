@@ -66,11 +66,11 @@ class VoterAuthController extends Controller
             throw new \Illuminate\Validation\ValidationException($validator);
         }
 
-        // Rotasi token otomatis tiap 2 menit (tanpa cron) — dipanggil tiap
-        // request login. Token lama otomatis diganti jika sudah lewat 2 menit.
+        // Rotasi token otomatis tiap 1 menit (tanpa cron) — dipanggil tiap
+        // request login. Token lama otomatis diganti jika sudah lewat 1 menit.
         $period = ElectionPeriod::where('is_active', true)->first();
         if ($period) {
-            $period->ensureFreshToken(2);
+            $period->ensureFreshToken(1);
         }
 
         // Filter 0: NISN ini milik admin? → login sebagai admin lalu ke panel.
